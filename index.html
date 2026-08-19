@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UNIVERSE — particle cosmos</title>
-    <meta name="description" content="A WebGL2 universe: half a million GPU-driven particles, GPGPU-simulated dust, procedural nebulae and HDR bloom." />
+    <title>SOLAR SYSTEM — an orbital model</title>
+    <meta name="description" content="An interactive WebGL model of our solar system with eight planets, moons, rings, asteroid belts and a deep stellar backdrop." />
     <style>
       :root {
         --fg: #cfe0ff;
@@ -73,6 +73,38 @@
         text-align: right;
         line-height: 1.8;
       }
+      .model-note {
+        position: absolute;
+        top: 24px;
+        right: 28px;
+        max-width: 260px;
+        color: var(--dim);
+        font-size: 10px;
+        line-height: 1.6;
+        letter-spacing: 0.08em;
+        text-align: right;
+        text-transform: uppercase;
+      }
+      #labels {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+      }
+      .celestial-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 3px 6px;
+        color: #c7d8f4;
+        background: rgb(3 8 20 / 55%);
+        border: 1px solid rgb(126 158 206 / 18%);
+        border-radius: 2px;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transition: opacity 0.2s ease;
+      }
       #veil {
         position: fixed;
         inset: 0;
@@ -105,9 +137,10 @@
     <div id="scene"></div>
     <div id="hud">
       <div class="brand">
-        <b>U</b>niverse
-        <small>WebGL2 &middot; GPU particles &middot; GPGPU dust</small>
+        <b>S</b>olar System
+        <small>WebGL2 &middot; eight planets &middot; orbital model</small>
       </div>
+      <div class="model-note">Distances and body sizes compressed for an all-system view</div>
       <div class="stats">
         <span id="fps">&ndash;</span> fps &middot; <span id="count">&ndash;</span> particles &middot;
         <span id="mode">&ndash;</span>
@@ -116,9 +149,10 @@
         drag &mdash; orbit &middot; scroll &mdash; zoom &middot; space &mdash; auto-orbit<br />
         r &mdash; reset camera &middot; h &mdash; hide ui
       </div>
+      <div id="labels"></div>
     </div>
     <div id="veil">
-      <p>FORMING UNIVERSE</p>
+      <p>ASSEMBLING ORBITS</p>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

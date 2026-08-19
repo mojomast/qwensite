@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A cutting-edge WebGL2 universe — half a million GPU particles, GPGPU-simulated dust, procedural nebulae and bloom.",
+  "description": "An interactive WebGL model of our solar system with planets, moons, rings and particle belts.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

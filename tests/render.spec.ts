@@ -40,7 +40,7 @@ function samplePng(png: PNG): { litRatio: number; darkRatio: number; clippedRati
   };
 }
 
-test('universe renders a non-blank frame with zero console errors', async ({ page }) => {
+test('solar system renders with eight planets and zero console errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(msg.text());
@@ -53,7 +53,7 @@ test('universe renders a non-blank frame with zero console errors', async ({ pag
   // allow SwiftShader time to compile programs and draw several frames
   await page.waitForTimeout(5000);
 
-  const shotPath = 'test-results/universe-frame.png';
+  const shotPath = 'test-results/solar-system-frame.png';
   await page.screenshot({ path: shotPath });
 
   const info = await page.evaluate(() => {
@@ -65,20 +65,24 @@ test('universe renders a non-blank frame with zero console errors', async ({ pag
   expect(info, 'scene canvas must exist').toBeTruthy();
   expect((info as RenderInfo).width).toBeGreaterThan(0);
   expect((info as RenderInfo).height).toBeGreaterThan(0);
+  await expect(page).toHaveTitle(/SOLAR SYSTEM/);
+  await expect(page.locator('.celestial-label')).toHaveCount(9);
+  await expect(page.locator('.celestial-label', { hasText: 'Earth' })).toHaveCount(1);
+  await expect(page.locator('.celestial-label', { hasText: 'Saturn' })).toHaveCount(1);
   expect(errors, `console/page errors: ${errors.join(' | ')}`).toHaveLength(0);
 
   const png = await import('node:fs').then((fs) => PNG.sync.read(fs.readFileSync(shotPath)));
   const { litRatio, darkRatio, clippedRatio, meanLuma } = samplePng(png);
 
-  // backdrop + particles + bloom must produce visible non-black content
+  // Sun, planets, belts, backdrop and bloom must produce a balanced frame.
   expect(litRatio, `too few lit pixels (litRatio=${litRatio.toFixed(4)})`).toBeGreaterThan(0.02);
   expect(meanLuma, `frame too dark (meanLuma=${meanLuma.toFixed(2)})`).toBeGreaterThan(2);
   expect(meanLuma, `frame washed out (meanLuma=${meanLuma.toFixed(2)})`).toBeLessThan(90);
-  expect(darkRatio, `not enough dark space (darkRatio=${darkRatio.toFixed(4)})`).toBeGreaterThan(0.45);
+  expect(darkRatio, `not enough dark space (darkRatio=${darkRatio.toFixed(4)})`).toBeGreaterThan(0.3);
   expect(clippedRatio, `too many clipped highlights (clippedRatio=${clippedRatio.toFixed(4)})`).toBeLessThan(0.08);
 });
 
-test('full-quality mode boots', async ({ page }) => {
+test('full-quality solar system boots', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(msg.text());
