@@ -49,6 +49,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(params.pixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.72;
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -98,7 +99,7 @@ for (let i = 0; i < params.backgroundGalaxies; i++) {
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.55, 0.0);
+const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.48, 0.38, 0.32);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 

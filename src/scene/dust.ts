@@ -157,7 +157,7 @@ const DUST_FRAG = /* glsl */ `
   void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     if (d > 1.0) discard;
-    float a = exp(-d * d * 4.0) * 0.55 * vFade;
+    float a = exp(-d * d * 4.0) * 0.36 * vFade;
     if (a < 0.004) discard;
     gl_FragColor = vec4(vec3(0.72, 0.78, 0.95) * a, a);
   }
@@ -237,7 +237,7 @@ export function createDust(
         value: active ? sim.getCurrentRenderTarget(positionVariable).texture : null,
       },
       uScale: { value: 1 },
-      uPointRadius: { value: 0.05 },
+      uPointRadius: { value: 0.024 },
     },
     vertexShader: DUST_VERT,
     fragmentShader: DUST_FRAG,

@@ -60,8 +60,9 @@ const NEBULA_FRAG = /* glsl */ `
     float s = sin(ang);
     uv = mat2(c, -s, s, c) * uv;
 
-    float n1 = vfbm(uv * 2.8 + uSeed * 7.31, uOctaves);
-    float n2 = vfbm(uv * 5.2 - uSeed * 3.77, uOctaves - 1);
+    vec2 drift = vec2(uTime * 0.009, -uTime * 0.006);
+    float n1 = vfbm(uv * 2.8 + drift + uSeed * 7.31, uOctaves);
+    float n2 = vfbm(uv * 5.2 - drift * 1.4 - uSeed * 3.77, uOctaves - 1);
     float density = smoothstep(0.30, 0.92, mix(n1, n2, 0.45));
     density *= 0.55 + 0.65 * smoothstep(0.2, 0.9, n1);
 
@@ -69,7 +70,7 @@ const NEBULA_FRAG = /* glsl */ `
     vec3 col = mix(uColorA, uColorB, clamp(n2 * 1.6, 0.0, 1.0));
     float a = density * mask * uOpacity;
     if (a < 0.004) discard;
-    gl_FragColor = vec4(col * a * 2.0, a);
+    gl_FragColor = vec4(col * 0.55, a);
   }
 `;
 
@@ -93,7 +94,7 @@ export function createNebulae(scene: THREE.Scene, camera: THREE.Camera, count: n
   const octaves = lowPower ? 4 : 5;
 
   for (let i = 0; i < count; i++) {
-    const size = 10 + Math.random() * 34;
+    const size = 8 + Math.random() * 16;
     const geometry = new THREE.PlaneGeometry(size, size);
     const [ca, cb] = PALETTES[i % PALETTES.length];
 
@@ -101,7 +102,7 @@ export function createNebulae(scene: THREE.Scene, camera: THREE.Camera, count: n
       uniforms: {
         uTime: { value: 0 },
         uSeed: { value: Math.random() },
-        uOpacity: { value: 0.09 + Math.random() * 0.22 },
+        uOpacity: { value: 0.018 + Math.random() * 0.035 },
         uOctaves: { value: octaves },
         uColorA: { value: new THREE.Color(ca) },
         uColorB: { value: new THREE.Color(cb) },
@@ -117,10 +118,10 @@ export function createNebulae(scene: THREE.Scene, camera: THREE.Camera, count: n
     mesh.renderOrder = 1;
 
     const angle = Math.random() * Math.PI * 2;
-    const dist = 6 + Math.random() * 58;
+    const dist = 20 + Math.random() * 55;
     mesh.position.set(
       Math.cos(angle) * dist,
-      (Math.random() * 2 - 1) * (2 + Math.random() * 8),
+      (Math.random() * 2 - 1) * (5 + Math.random() * 12),
       Math.sin(angle) * dist,
     );
     sprites.push(mesh);

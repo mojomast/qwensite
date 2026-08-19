@@ -15,18 +15,17 @@ const VERT = /* glsl */ `
   const float BRANCHES = 3.0;
 
   void main() {
-    float radius = pow(aData.x, 1.5) * uSpread;
+    float radius01 = pow(aData.x, 0.72);
+    float radius = radius01 * uSpread;
     float branchAngle = (aData.y / BRANCHES) * 6.28318530;
-    float spin = uTime * uSpin * (1.0 - aData.x);
-
-    vec3 offset = aRand * (aData.x * 0.6 + 0.05);
-    offset.y *= 0.35 + uThickness * pow(1.0 - aData.x, 1.5);
-
-    float angle = branchAngle + spin;
+    float spiral = radius01 * 5.8;
+    float spin = uTime * uSpin * (1.0 - radius01) * 0.22;
+    float radialJitter = aRand.x * (0.08 + radius01 * 0.32);
+    float angle = branchAngle + spiral + spin + aRand.z * (0.04 + radius01 * 0.14);
     vec3 p = vec3(
-      cos(angle) * radius + offset.x,
-      offset.y,
-      sin(angle) * radius + offset.z
+      cos(angle) * (radius + radialJitter),
+      aRand.y * (0.05 + uThickness * pow(1.0 - radius01, 1.4)),
+      sin(angle) * (radius + radialJitter)
     );
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
@@ -86,8 +85,8 @@ function buildGalaxy(opts: GalaxyOptions) {
   for (let i = 0; i < count; i++) {
     data[i * 4] = Math.random();
     data[i * 4 + 1] = Math.floor(Math.random() * 3);
-    data[i * 4 + 2] = (0.03 + Math.pow(Math.random(), 4) * 0.5) * size;
-    data[i * 4 + 3] = Math.random();
+    data[i * 4 + 2] = (0.008 + Math.pow(Math.random(), 5) * 0.12) * size;
+    data[i * 4 + 3] = data[i * 4];
 
     rand[i * 3] = Math.random() * 2 - 1;
     rand[i * 3 + 1] = (Math.random() * 2 - 1) * 0.6;
@@ -183,8 +182,8 @@ export function createGalaxy(
   count: number,
   getScale: () => number,
 ): GalaxyHandle {
-  const galaxy = buildGalaxy({ count, spread: 5, spin: 0.5 });
-  const glow = createCoreGlow(2.6, '#ffd9a8', 0.85);
+  const galaxy = buildGalaxy({ count, spread: 5, spin: 0.5, opacity: 0.5 });
+  const glow = createCoreGlow(1.8, '#ffd9a8', 0.22);
 
   const group = new THREE.Group();
   group.add(galaxy.mesh);
@@ -225,7 +224,7 @@ export function createBackgroundGalaxy(
     spread: 9,
     spin: 0.12,
     size: 0.55,
-    opacity: 0.75,
+    opacity: 0.32,
     inner: '#b39cff',
     outer: '#1d2f6e',
   });

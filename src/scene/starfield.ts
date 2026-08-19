@@ -18,9 +18,9 @@ const VERT = /* glsl */ `
   void main() {
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = aSize * (uScale / max(0.1, -mv.z));
+    gl_PointSize = clamp(aSize * (uScale / max(0.1, -mv.z)), 1.8, 6.0);
     vColor = aColor;
-    vTwinkle = 0.72 + 0.28 * sin(uTime * aPhase.y + aPhase.x);
+    vTwinkle = 0.58 + 0.42 * sin(uTime * aPhase.y + aPhase.x);
   }
 `;
 
@@ -34,9 +34,9 @@ const FRAG = /* glsl */ `
     if (d > 1.0) discard;
     float disk = smoothstep(1.0, 0.12, d);
     float core = smoothstep(0.5, 0.0, d);
-    float a = disk * vTwinkle;
-    vec3 col = vColor * (0.7 + 1.1 * core);
-    gl_FragColor = vec4(col * a, a);
+    float a = disk * (0.18 + 0.5 * vTwinkle);
+    vec3 col = vColor * (0.25 + 0.9 * core);
+    gl_FragColor = vec4(col, a);
   }
 `;
 
@@ -56,7 +56,9 @@ export function createStarfield(scene: THREE.Scene, count: number, getScale: () 
     const v = Math.random();
     const theta = 2 * Math.PI * u;
     const phi = Math.acos(2 * v - 1);
-    const radius = 900 + Math.random() * 600;
+    // Multiple depth layers create visible camera parallax instead of a
+    // single wallpaper-like shell. Bias most stars toward the far field.
+    const radius = 180 + Math.pow(Math.random(), 0.55) * 1100;
 
     positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
     positions[i * 3 + 1] = radius * Math.cos(phi);
@@ -107,6 +109,8 @@ export function createStarfield(scene: THREE.Scene, count: number, getScale: () 
     update(elapsed) {
       material.uniforms.uTime.value = elapsed;
       material.uniforms.uScale.value = getScale();
+      points.rotation.y = elapsed * 0.002;
+      points.rotation.x = Math.sin(elapsed * 0.001) * 0.04;
     },
     dispose() {
       points.removeFromParent();

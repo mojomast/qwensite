@@ -9,10 +9,12 @@ interface RenderInfo {
 }
 
 /** Counts sampled pixels that are visibly not black, plus mean luminance. */
-function samplePng(png: PNG): { litRatio: number; meanLuma: number } {
+function samplePng(png: PNG): { litRatio: number; darkRatio: number; clippedRatio: number; meanLuma: number } {
   const w = png.width;
   const h = png.height;
   let lit = 0;
+  let dark = 0;
+  let clipped = 0;
   let total = 0;
   let lumaSum = 0;
   const step = 8;
@@ -26,9 +28,16 @@ function samplePng(png: PNG): { litRatio: number; meanLuma: number } {
       const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
       lumaSum += luma;
       if (luma > 6) lit++;
+      if (luma < 24) dark++;
+      if (luma > 245) clipped++;
     }
   }
-  return { litRatio: lit / total, meanLuma: lumaSum / total };
+  return {
+    litRatio: lit / total,
+    darkRatio: dark / total,
+    clippedRatio: clipped / total,
+    meanLuma: lumaSum / total,
+  };
 }
 
 test('universe renders a non-blank frame with zero console errors', async ({ page }) => {
@@ -59,11 +68,14 @@ test('universe renders a non-blank frame with zero console errors', async ({ pag
   expect(errors, `console/page errors: ${errors.join(' | ')}`).toHaveLength(0);
 
   const png = await import('node:fs').then((fs) => PNG.sync.read(fs.readFileSync(shotPath)));
-  const { litRatio, meanLuma } = samplePng(png);
+  const { litRatio, darkRatio, clippedRatio, meanLuma } = samplePng(png);
 
   // backdrop + particles + bloom must produce visible non-black content
   expect(litRatio, `too few lit pixels (litRatio=${litRatio.toFixed(4)})`).toBeGreaterThan(0.02);
-  expect(meanLuma, `frame too dark (meanLuma=${meanLuma.toFixed(4)})`).toBeGreaterThan(0.015);
+  expect(meanLuma, `frame too dark (meanLuma=${meanLuma.toFixed(2)})`).toBeGreaterThan(2);
+  expect(meanLuma, `frame washed out (meanLuma=${meanLuma.toFixed(2)})`).toBeLessThan(90);
+  expect(darkRatio, `not enough dark space (darkRatio=${darkRatio.toFixed(4)})`).toBeGreaterThan(0.45);
+  expect(clippedRatio, `too many clipped highlights (clippedRatio=${clippedRatio.toFixed(4)})`).toBeLessThan(0.08);
 });
 
 test('full-quality mode boots', async ({ page }) => {

@@ -10,6 +10,6 @@ export function blackbody(kelvin: number): [number, number, number] {
     k <= 66 ? 99.4708025861 * Math.log(k) - 161.1195681661 : 288.1221695283 * Math.pow(k - 60, -0.0755148492);
   const b = k >= 66 ? 255 : k <= 19 ? 0 : 138.5177312231 * Math.log(k - 10) - 305.0447927307;
 
-  const clamp01 = (v: number): number => Math.min(1, Math.max(0, v)) / 255;
+  const clamp01 = (v: number): number => Math.min(255, Math.max(0, v)) / 255;
   return [clamp01(r), clamp01(g), clamp01(b)];
 }
