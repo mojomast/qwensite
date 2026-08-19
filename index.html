@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UNIVERSE — particle cosmos</title>
+    <meta name="description" content="A WebGL2 universe: half a million GPU-driven particles, GPGPU-simulated dust, procedural nebulae and HDR bloom." />
+    <style>
+      :root {
+        --fg: #cfe0ff;
+        --dim: #55648a;
+        --accent: #8fb7ff;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      #scene {
+        position: fixed;
+        inset: 0;
+      }
+      canvas {
+        display: block;
+      }
+      #hud {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+        color: var(--fg);
+        z-index: 5;
+      }
+      .brand {
+        position: absolute;
+        top: 24px;
+        left: 28px;
+        letter-spacing: 0.35em;
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+      .brand b {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .brand small {
+        display: block;
+        margin-top: 6px;
+        letter-spacing: 0.14em;
+        font-size: 10px;
+        color: var(--dim);
+        text-transform: none;
+      }
+      .stats {
+        position: absolute;
+        bottom: 22px;
+        left: 28px;
+        font-size: 11px;
+        color: var(--dim);
+        line-height: 1.8;
+      }
+      .stats span {
+        color: var(--fg);
+      }
+      .hints {
+        position: absolute;
+        bottom: 22px;
+        right: 28px;
+        font-size: 11px;
+        color: var(--dim);
+        text-align: right;
+        line-height: 1.8;
+      }
+      #veil {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.9s ease;
+        z-index: 10;
+      }
+      #veil.fade {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #veil p {
+        letter-spacing: 0.45em;
+        font-size: 11px;
+        color: var(--dim);
+        animation: pulse 1.6s ease-in-out infinite;
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.3;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scene"></div>
+    <div id="hud">
+      <div class="brand">
+        <b>U</b>niverse
+        <small>WebGL2 &middot; GPU particles &middot; GPGPU dust</small>
+      </div>
+      <div class="stats">
+        <span id="fps">&ndash;</span> fps &middot; <span id="count">&ndash;</span> particles &middot;
+        <span id="mode">&ndash;</span>
+      </div>
+      <div class="hints">
+        drag &mdash; orbit &middot; scroll &mdash; zoom &middot; space &mdash; auto-orbit<br />
+        r &mdash; reset camera &middot; h &mdash; hide ui
+      </div>
+    </div>
+    <div id="veil">
+      <p>FORMING UNIVERSE</p>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
